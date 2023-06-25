@@ -23,17 +23,17 @@ const boidSets: BoidSettings =  {
     strokeColor: "cyan",
 }
 
-const boids = new Boids(50, boidSets);
+const boids = new Boids(50, boidSets, WIDTH, HEIGHT);
 
-function Setup() {
+function Setup(): void {
     CANVAS.width = WIDTH;
     CANVAS.height = HEIGHT;
-    console.log(boids.boids);
     Update();
 }
 
 async function Update() {
     await Sleep(TICK_RATE);
+    CTX.clearRect(0, 0, WIDTH, HEIGHT);
     boids.UpdateBoids(CTX);
     Update();
 }

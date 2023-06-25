@@ -1,0 +1,6 @@
+1. Cap boid speed 
+2. Draw boids as triangles
+3. Actually update boids acceleration due to factors
+4. Initialize boids at random location, with random velocity, maybe random acc prob not though
+5. Create obstacles
+999. more idk

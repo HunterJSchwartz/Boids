@@ -6,23 +6,33 @@ export class Boids {
 
     boids: Boid[] = [];
     
-    constructor(numBoids: number, sets: BoidSettings) {
-        this.CreateBoids(numBoids, sets);   
+    constructor(numBoids: number, sets: BoidSettings, width: number, height: number) {
+        this.CreateBoids(numBoids, sets, width, height);   
     }
 
-    CreateBoids(numBoids: number, sets: BoidSettings) {
+    CreateBoids(numBoids: number, sets: BoidSettings, width: number, height: number): void {
         for(let i = 0; i < numBoids; i++) {
-            const pos = new Vector(0, 0);
-            const vel = new Vector(0, 0);
+            const pos = this.GetRandomPos(width, height); 
+            const vel = this.GetRandomVel(sets.maxSpeed);
             const acc = new Vector(0, 0);
             const boid = new Boid(pos, vel, acc, sets);
             this.boids.push(boid);
         }
     }
 
-    UpdateBoids(ctx: CanvasRenderingContext2D) {
+    UpdateBoids(ctx: CanvasRenderingContext2D): void {
         for(let i = 0; i < this.boids.length; i++) {
+            this.boids[i].Move();
             this.boids[i].Draw(ctx);
         }
+    }
+
+    GetRandomPos(width: number, height: number): Vector {
+        return new Vector(Math.random() * width, Math.random() * height);
+    }
+
+    GetRandomVel(maxSpeed: number): Vector {
+        return new Vector((Math.random() - 0.5) * 2, (Math.random() - 0.5) * 2)
+                            .Mult(Math.random() * (maxSpeed - 0.5) + 0.5);
     }
 }

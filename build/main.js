@@ -26,16 +26,16 @@ const boidSets = {
     fillColor: "blue",
     strokeColor: "cyan",
 };
-const boids = new Boids(50, boidSets);
+const boids = new Boids(50, boidSets, WIDTH, HEIGHT);
 function Setup() {
     CANVAS.width = WIDTH;
     CANVAS.height = HEIGHT;
-    console.log(boids.boids);
     Update();
 }
 function Update() {
     return __awaiter(this, void 0, void 0, function* () {
         yield Sleep(TICK_RATE);
+        CTX.clearRect(0, 0, WIDTH, HEIGHT);
         boids.UpdateBoids(CTX);
         Update();
     });
