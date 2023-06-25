@@ -1,13 +1,17 @@
 import { Vector } from "./Vector.js";
 export class Boid {
     constructor(position, velocity, acceleration, sets) {
+        this.containPadding = 75;
         this.position = position;
         this.velocity = velocity;
         this.acceleration = acceleration;
         this.sets = sets;
     }
-    Move() {
-        this.acceleration = this.acceleration;
+    Move(boids) {
+        this.acceleration = this.acceleration.Add(this.Contain())
+            .Add(this.Align(boids))
+            .Add(this.Seperate(boids))
+            .Add(this.Cohesion(boids));
         this.velocity = this.CapSpeed(this.velocity.Add(this.acceleration));
         this.position = this.position.Add(this.velocity);
     }
@@ -20,16 +24,82 @@ export class Boid {
         }
     }
     Contain() {
-        const left = this.position.x - this.sets.visionRad;
-        const right = this.position.x + this.sets.visionRad;
-        const bottom = this.position.y - this.sets.visionRad;
-        const top = this.position.y + this.sets.visionRad;
+        const left = this.position.x - this.containPadding;
+        const right = this.position.x + this.containPadding;
+        const bottom = this.position.y + this.containPadding;
+        const top = this.position.y - this.containPadding;
+        let dir = new Vector(0, 0);
         if (left < 0) {
+            dir = dir.Add(new Vector(1, 0)).Mult(this.sets.containForce);
         }
+        if (right > 1280) {
+            dir = dir.Add(new Vector(-1, 0)).Mult(this.sets.containForce);
+        }
+        if (top < 0) {
+            dir = dir.Add(new Vector(0, 1)).Mult(this.sets.containForce);
+        }
+        if (bottom > 720) {
+            dir = dir.Add(new Vector(0, -1)).Mult(this.sets.containForce);
+        }
+        return dir;
     }
-    Align() { }
-    Seperate() { }
-    Cohesion() { }
+    Align(boids) {
+        let dir = new Vector(0, 0);
+        let localBoids = 0;
+        for (const boid of boids) {
+            const dist = this.position.Distance(boid.position);
+            if (dist <= this.sets.visionRad && boid !== this) {
+                dir = dir.Add(boid.velocity);
+                localBoids++;
+            }
+        }
+        if (localBoids > 0) {
+            dir = dir.Div(localBoids);
+            dir = dir.Normalize().Mult(this.sets.maxSpeed);
+            dir = dir.Sub(this.velocity);
+            dir = dir.Normalize().Mult(this.sets.pullForce).Mult(this.sets.alignForce);
+        }
+        return dir;
+    }
+    Seperate(boids) {
+        let dir = new Vector(0, 0);
+        let localBoids = 0;
+        for (const boid of boids) {
+            const dist = this.position.Distance(boid.position);
+            if (dist <= this.sets.visionRad && boid !== this) {
+                let diff = this.position.Sub(boid.position);
+                diff = diff.Div(dist * dist);
+                dir = dir.Add(diff);
+                localBoids++;
+            }
+        }
+        if (localBoids > 0) {
+            dir = dir.Div(localBoids);
+            dir = dir.Normalize().Mult(this.sets.maxSpeed);
+            dir = dir.Sub(this.velocity);
+            dir = dir.Normalize().Mult(this.sets.pullForce).Mult(this.sets.seperationForce);
+        }
+        return dir;
+    }
+    Cohesion(boids) {
+        let dir = new Vector(0, 0);
+        let localBoids = 0;
+        for (const boid of boids) {
+            const dist = this.position.Distance(boid.position);
+            if (dist <= this.sets.visionRad && boid !== this) {
+                dir = dir.Add(boid.position);
+                localBoids++;
+            }
+        }
+        if (localBoids > 0) {
+            dir = dir.Div(localBoids);
+            dir = dir.Sub(this.position);
+            dir = dir.Normalize().Mult(this.sets.maxSpeed);
+            dir = dir.Sub(this.velocity);
+            dir = dir.Normalize().Mult(this.sets.pullForce).Mult(this.sets.cohesionForce);
+        }
+        return dir;
+    }
     GetPoints() {
         let dir;
         let perp;
@@ -58,7 +128,6 @@ export class Boid {
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
-        this.DrawVisionCircle(ctx);
     }
     //Debug
     DrawVisionCircle(ctx) {

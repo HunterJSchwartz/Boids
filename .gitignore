@@ -1,5 +1,5 @@
 /node_modules/
 /package-lock.json
 /tsconfig.json
-/jest.config.js
-/TODO
+jest.config.js
+TODO

@@ -1,6 +1,7 @@
 export type BoidSettings = {
     visionRad: number;
     maxSpeed: number;
+    containForce: number;
     pullForce: number;
     alignForce: number;
     cohesionForce: number;

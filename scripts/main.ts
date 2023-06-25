@@ -4,26 +4,24 @@ import { Boids } from "./Boids.js";
 const HEIGHT: number = 720;
 const WIDTH: number = 1280;
 
-const FPS: number = 60;
-const TICK_RATE: number = 1000 / FPS;
-
 const CANVAS: HTMLCanvasElement = document.getElementById("canvas") as HTMLCanvasElement;
 const CTX = CANVAS.getContext("2d") as CanvasRenderingContext2D; 
 
 const boidSets: BoidSettings =  {
-    visionRad: 30,
-    maxSpeed: 2.75,
-    pullForce: 0.5,
-    alignForce: 0.2,
+    visionRad: 50,
+    maxSpeed: 5.5,
+    containForce: .5,
+    pullForce: .6,
+    alignForce: 0.3,
     cohesionForce: 0.05,
-    seperationForce: 0.15,
+    seperationForce: 0.12,
     avoidForce: 0.25,
     size: 5,
     fillColor: "blue",
     strokeColor: "cyan",
 }
 
-const boids = new Boids(50, boidSets, WIDTH, HEIGHT);
+const boids = new Boids(200, boidSets, WIDTH, HEIGHT);
 
 function Setup(): void {
     CANVAS.width = WIDTH;
@@ -31,11 +29,10 @@ function Setup(): void {
     Update();
 }
 
-async function Update() {
-    await Sleep(TICK_RATE);
+function Update() {
     CTX.clearRect(0, 0, WIDTH, HEIGHT);
     boids.UpdateBoids(CTX);
-    Update();
+    window.requestAnimationFrame(Update);
 }
 
 function Sleep(ms: number) {

@@ -9,14 +9,14 @@ export class Boids {
         for (let i = 0; i < numBoids; i++) {
             const pos = this.GetRandomPos(width, height);
             const vel = this.GetRandomVel(sets.maxSpeed);
-            const acc = new Vector(0, 0);
+            const acc = new Vector(Math.random(), Math.random());
             const boid = new Boid(pos, vel, acc, sets);
             this.boids.push(boid);
         }
     }
     UpdateBoids(ctx) {
         for (let i = 0; i < this.boids.length; i++) {
-            this.boids[i].Move();
+            this.boids[i].Move(this.boids);
             this.boids[i].Draw(ctx);
         }
     }
